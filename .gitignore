@@ -1,0 +1,8 @@
+
+.env
+__pycache__/
+*.py[cod]
+/data/processed/
+/models/artifacts/
+/venv/
+/.venv/

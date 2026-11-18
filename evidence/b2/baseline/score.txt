@@ -1,0 +1,8 @@
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.11.18
+Date: Wed, 18 Nov 2026 23:14:25 GMT
+Content-Type: application/json
+Content-Length: 46
+Connection: close
+
+{"score":6.514147292084253e-09,"spike":false}

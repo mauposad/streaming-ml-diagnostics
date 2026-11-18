@@ -1,0 +1,114 @@
+name: docker
+services:
+  broker:
+    container_name: broker
+    environment:
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_BROKER_ID: "1"
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker:29093
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: "0"
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://broker:29092,CONTROLLER://broker:29093,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+      KAFKA_NODE_ID: "1"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
+    hostname: broker
+    image: apache/kafka:latest
+    networks:
+      default: null
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - /opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092
+      timeout: 5s
+      interval: 10s
+      retries: 10
+      start_period: 20s
+    ports:
+      - mode: ingress
+        target: 9092
+        published: "9092"
+        protocol: tcp
+  mlflow:
+    container_name: mlflow
+    command:
+      - mlflow
+      - server
+      - --host
+      - 0.0.0.0
+      - --port
+      - "5000"
+      - --backend-store-uri
+      - sqlite:///mlflow/mlflow.db
+      - --default-artifact-root
+      - mlflow-artifacts:/
+      - --artifacts-destination
+      - file:/mlflow/artifacts
+    environment:
+      MLFLOW_BACKEND_STORE_URI: sqlite:///mlflow/mlflow.db
+    hostname: mlflow
+    image: ghcr.io/mlflow/mlflow:v2.14.1
+    networks:
+      default: null
+    volumes:
+      - type: volume
+        source: mlflow_data
+        target: /mlflow
+        volume: {}
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - python -c "import urllib.request; urllib.request.urlopen('http://localhost:5000')"
+      timeout: 5s
+      interval: 10s
+      retries: 10
+      start_period: 15s
+    ports:
+      - mode: ingress
+        target: 5000
+        published: "5001"
+        protocol: tcp
+  scorer:
+    container_name: scorer
+    environment:
+      MODEL_PATH: /app/models/artifacts/model-b2-missing.pkl
+    networks:
+      default: null
+    volumes:
+      - type: bind
+        source: /Users/arshwu/streaming-ml-diagnostics/streaming-ml-diagnostics/models/artifacts
+        target: /app/models/artifacts
+        read_only: true
+        bind: {}
+    build:
+      context: /Users/arshwu/streaming-ml-diagnostics/streaming-ml-diagnostics
+      dockerfile: docker/Dockerfile.scorer
+    depends_on:
+      broker:
+        condition: service_healthy
+        required: true
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
+      timeout: 5s
+      interval: 10s
+      retries: 5
+      start_period: 10s
+    ports:
+      - mode: ingress
+        target: 8000
+        published: "8000"
+        protocol: tcp
+networks:
+  default:
+    name: docker_default
+volumes:
+  mlflow_data:
+    name: docker_mlflow_data

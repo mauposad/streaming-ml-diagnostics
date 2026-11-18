@@ -1,0 +1,1 @@
+/app/models/artifacts/model-b2-missing.pkl

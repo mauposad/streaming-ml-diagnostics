@@ -1,0 +1,4 @@
+NAME      IMAGE                           COMMAND                  SERVICE   CREATED          STATUS                    PORTS
+broker    apache/kafka:latest             "/__cacert_entrypoin…"   broker    17 minutes ago   Up 17 minutes (healthy)   0.0.0.0:9092->9092/tcp, [::]:9092->9092/tcp
+mlflow    ghcr.io/mlflow/mlflow:v2.14.1   "mlflow server --hos…"   mlflow    17 minutes ago   Up 17 minutes (healthy)   0.0.0.0:5001->5000/tcp, [::]:5001->5000/tcp
+scorer    docker-scorer                   "python scoring/scor…"   scorer    11 seconds ago   Up 7 seconds (healthy)    0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp

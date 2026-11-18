@@ -37,6 +37,17 @@ def load_model():
 def health():
     return jsonify({"status": "ok", "model_loaded": _state["model"] is not None})
 
+@app.route("/ready", methods=["GET"])
+def ready():
+    model_loaded = _state["model"] is not None
+    scaler_loaded = _state["scaler"] is not None
+    is_ready = model_loaded and scaler_loaded
+
+    return jsonify({
+        "status": "ready" if is_ready else "not_ready",
+        "model_loaded": model_loaded,
+        "scaler_loaded": scaler_loaded,
+    }), 200 if is_ready else 503
 
 @app.route("/score", methods=["POST"])
 def score():
