@@ -1,0 +1,33 @@
+# python -m cProfile -s cumtime features/featurizer.py --max_messages 13000
+# Run 2026-11-18 ~14:18 after clean state + replay --rate 0 (15,640 msgs). Top 30 by cumulative time (as captured from terminal).
+   Ordered by: cumulative time
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+   1614/1    0.015    0.000    5.939    5.939 {built-in method builtins.exec}
+        1    0.000    0.000    5.939    5.939 featurizer.py:1(<module>)
+        1    0.055    0.055    5.499    5.499 featurizer.py:103(run_featurizer)
+    15570    0.003    0.000    3.177    0.000 consumer.py:288(poll)
+    15570    3.173    0.000    3.173    0.000 {method 'poll' of 'cimpl.Consumer' objects}
+      207    0.002    0.000    2.379    0.011 __init__.py:1(<module>)
+      520    0.003    0.000    1.748    0.003 featurizer.py:166(_append_parquet)
+      520    0.000    0.000    0.983    0.002 _decorators.py:325(wrapper)
+      520    0.001    0.000    0.982    0.002 frame.py:3029(to_parquet)
+      520    0.002    0.000    0.982    0.002 parquet.py:411(to_parquet)
+      520    0.012    0.000    0.943    0.002 parquet.py:174(write)
+2985/1568    0.005    0.000    0.770    0.000 <frozen importlib._bootstrap>:1349(_find_and_load)
+  1419/10    0.002    0.000    0.769    0.077 <frozen importlib._bootstrap>:1304(_find_and_load_unlocked)
+  1346/10    0.002    0.000    0.768    0.077 <frozen importlib._bootstrap>:911(_load_unlocked)
+  1221/10    0.001    0.000    0.768    0.077 <frozen importlib._bootstrap_external>:993(exec_module)
+  3120/20    0.002    0.000    0.765    0.038 <frozen importlib._bootstrap>:480(_call_with_frames_removed)
+      519    0.002    0.000    0.583    0.001 parquet.py:500(read_parquet)
+      519    0.004    0.000    0.566    0.001 parquet.py:240(read)
+      520    0.002    0.000    0.492    0.001 core.py:1857(write_table)
+      520    0.451    0.001    0.451    0.001 core.py:1080(write_table)
+   583/72    0.000    0.000    0.429    0.006 {built-in method builtins.__import__}
+      520    0.009    0.000    0.382    0.001 pandas_compat.py:562(dataframe_to_arrays)
+      519    0.002    0.000    0.327    0.001 _util.py:62(arrow_table_to_pandas)
+      519    0.004    0.000    0.313    0.001 pandas_compat.py:752(table_to_dataframe)
+     1531    0.001    0.000    0.293    0.000 threading.py:1117(join)
+18662/13805    0.014    0.000    0.290    0.000 {method 'acquire' of '_thread.lock' objects}
+     1531    0.001    0.000    0.284    0.000 threading.py:1155(_wait_for_tstate_lock)
+        1    0.000    0.000    0.276    0.276 app.py:1(<module>)
